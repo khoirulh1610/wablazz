@@ -7,14 +7,14 @@ const fs = require('fs');
 const { phoneNumberFormatter } = require('./helpers/formatter');
 const fileUpload = require('express-fileupload');
 const axios = require('axios');
-const port = process.env.PORT || 8001;
+const port = process.env.PORT || 8091;
 const bodyParser = require('body-parser')
 const jsonParser = bodyParser.json()
 const qrcode = require('qrcode-terminal');
 const app = express();
 const server = http.createServer(app);
 
-const callback_server = "https://autolanding.id/";
+const callback_server = "https://wablass.vincero.my.id";
 
 app.use(express.json());
 app.use(express.urlencoded({

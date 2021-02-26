@@ -1,3 +1,3 @@
-autowa/node_modules
-autowa/whatsapp-session.json
-autowa/package-lock.json
+service/node_modules
+service/whatsapp-session.json
+service/package-lock.json

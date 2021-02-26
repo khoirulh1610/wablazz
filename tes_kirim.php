@@ -9,9 +9,9 @@ if($login == 0){
 if(post("pesan")){
     $nomor = post("nomor");
     $pesan = post("pesan");
-    
+    // echo $nomor.$pesan;
     //toastr_set("error", "fitur dimatikan sementara"); 
-
+    
     $res = sendMSG($nomor, $pesan);
     if($res['status'] == "true"){
         toastr_set("success", "Pesan terkirim"); 

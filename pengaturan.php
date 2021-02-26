@@ -400,7 +400,7 @@ if(get("act") == "gapi"){
         getWaStatus();
         setInterval(getWaStatus, 3000);
         function getWaStatus(){
-            $.get( "<?= url_wa() ?>/status", function( data ) {
+            $.get( "/status.php", function( data ) {
                 console.log(data);
                 if(data.msg == "READY"){
                     $("#status").html('<span class="badge badge-success">READY</span>');
