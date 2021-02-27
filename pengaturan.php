@@ -413,7 +413,7 @@ if(get("act") == "gapi"){
         }
 
         function getAndShowQR(){
-            $.get( "<?= url_wa() ?>/qr", function( data ) {
+            $.get( "/qr.php", function( data ) {
                 if(data.data.qr){
                   $("#qr").empty();
                   new QRCode(document.getElementById("qr"), data.data.qr);

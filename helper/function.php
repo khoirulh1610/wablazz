@@ -388,3 +388,17 @@ function googleForm(){
 
     return $i;
 }
+
+function SpinText($string){
+    if (strpos($string, "{")) { // required if $start not exist in $string
+        $startCharCount = strpos($string,"{") + strlen("{");
+        $firstSubStr = substr($string, $startCharCount, strlen($string));
+        $endCharCount = strpos($firstSubStr, "}");
+        if ($endCharCount == 0) {
+            $endCharCount = strlen($firstSubStr);
+        }
+        return substr($firstSubStr, 0, $endCharCount);
+    } else {
+        return $string;
+    }
+}

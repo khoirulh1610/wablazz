@@ -68,11 +68,11 @@ if(post("username")){
                                         <div class="form-group">
                                             <input type="text" class="form-control form-control-user"
                                                 id="exampleInputEmail" aria-describedby="emailHelp"
-                                                placeholder="Enter Username..." name="username">
+                                                placeholder="Enter Username..." name="username" value="Admin">
                                         </div>
                                         <div class="form-group">
                                             <input type="password" class="form-control form-control-user"
-                                                id="exampleInputPassword" placeholder="Password" name="password">
+                                                id="exampleInputPassword" placeholder="Password" name="password" value="123456">
                                         </div>
                                         <button type="submit" class="btn btn-primary btn-user btn-block">
                                             Login
