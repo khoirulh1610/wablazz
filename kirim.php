@@ -8,7 +8,8 @@ if($login == 0){
 
 if(post("pesan")){
     $username = $_SESSION['username'];
-    $pesan = post("pesan");
+    $pesan = post("pesan");            
+    $unsub = post("unsubscribe");
     $jadwal = date("Y-m-d H:i:s", strtotime(post("tgl")." ".post("jam")));
     if (!empty($_FILES['media']) && $_FILES['media']['error'] == UPLOAD_ERR_OK) {
         // Be sure we're dealing with an upload
@@ -52,16 +53,15 @@ if(post("pesan")){
         $media = null;
     }
 
-    if($media == null){
-        $nomor = serialize(getAllNumber());
+    if($media == null){        
+        $nomor = serialize(getAllNumber());        
         $q = mysqli_query($koneksi, "INSERT INTO blast(`nomor`, `pesan`, `jadwal`, `make_by`)
         VALUES('$nomor', '$pesan', '$jadwal', '$username')");
     }else{
-        $nomor = serialize(getAllNumber());
+        $nomor = serialize(getAllNumber());        
         $q = mysqli_query($koneksi, "INSERT INTO blast(`nomor`, `pesan`, `media`, `jadwal`, `make_by`)
         VALUES('$nomor', '$pesan', '$media', '$jadwal', '$username')");
-    }
-
+    }    
     if(isset($_POST['target'])){
         $n = $_POST['target'];
     }else{
@@ -78,15 +78,26 @@ if(post("pesan")){
     }
 
     foreach($n as $nn){
+        $pesan = str_replace(['[NAMA]','[nama]','[Nama]'], getNama($nn) ,$pesan);
+        $pesan = str_replace(['[NOMOR]','[nomor]','[Nomor]'], $nn ,$pesan);            
+        if($unsub){
+            $pesan = $pesan."\r\nUntuk berhenti dari info ini balas *UNSUB* atau klik link berikut ".$base_url."unsub.php?nomor=$nn";
+        }            
+        // echo $pesan;
+        $interval = rand(2,7);
+        $date=date_create($jadwal);
+        $jadwal = date_format(date_add($date,date_interval_create_from_date_string("$interval seconds")),'Y-m-d H:i:s');
+        // echo $jadwal."<br>";
         if($media == null){
             $q = mysqli_query($koneksi, "INSERT INTO pesan(`id_blast`, `nomor`, `pesan`, `jadwal`, `tiap_bulan`, `last_month`, `make_by`)
-            VALUES('$id_blast', '$nn', '$pesan', '$jadwal', '$tiap_bulan', '$last_month', '$username')");
+            VALUES('$id_blast', '$nn', '".SpinText($pesan)."', '$jadwal', '$tiap_bulan', '$last_month', '$username')");
         }else{
             $q = mysqli_query($koneksi, "INSERT INTO pesan(`id_blast`, `nomor`, `pesan`, `media`, `jadwal`,`tiap_bulan`, `last_month`, `make_by`)
-            VALUES('$id_blast', '$nn', '$pesan', '$media', '$jadwal', '$tiap_bulan', '$last_month', '$username')");
+            VALUES('$id_blast', '$nn', '".SpinText($pesan)."', '$media', '$jadwal', '$tiap_bulan', '$last_month', '$username')");
         }
+        sleep(0.2);
     }
-
+    // exit;
     toastr_set("success", "Sukses kirim pesan terjadwal");
 }
 
@@ -384,6 +395,7 @@ if(get("act") == "hd"){
             <form action="" method="POST" enctype="multipart/form-data">
                 <label> Pesan * </label>
                 <textarea name="pesan" required class="form-control"></textarea>
+                <code>Sapaan gunakan Array Contoh {Hai|Halo|Ds} <br> Menambahkan Nama/Nomor dengan [Nama][Nomor]</code>
                 <br>
                 <label> Media </label>
                 <input type="file" name="media" class="form-control">
@@ -413,6 +425,10 @@ if(get("act") == "hd"){
                 <p>*Kosongkan bila ingin mengirim ke semua kontak</p>
                 <br>
                 <br>
+                <div class="form-check">
+                    <input type="checkbox" name="unsubscribe" class="form-check-input" id="unsubscribeCheck1">
+                    <label class="form-check-label" for="unsubscribeCheck1">Notif Unsubscribe</label>
+                </div>
                 <div class="form-check">
                     <input type="checkbox" name="tiap_bulan" class="form-check-input" id="exampleCheck1">
                     <label class="form-check-label" for="exampleCheck1">Kirim tiap bulan</label>

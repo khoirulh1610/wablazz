@@ -2,8 +2,12 @@
 include_once("helper/koneksi.php");
 include_once("helper/function.php");
 
+
+$runchek = true;
+
 $cek = cekStatusWA();
 if($cek['msg'] == "READY"){
+    $runchek = false;
     $count = 0;
     $now = strtotime(date("Y-m-d H:i:s"));
     $chunk = getSingleValDB("pengaturan", 'id', '1', 'chunk');
@@ -57,7 +61,22 @@ if($cek['msg'] == "READY"){
     syncMSG();
     
     echo "sukses kirim ".$count." pesan";
+    $runchek = true;
 }else{
+    $runchek = true;
     echo "whatsapp not ready";
 }
 
+
+
+// $i=0;
+// while (true) {
+//     if($runchek = true){
+//         Run();
+//         echo "Run Processs ".$i++."\r\n";
+//     }else{
+//         echo "Jek Mlaku ".$i++."\r\n";        
+//     }
+
+//     sleep(2);
+// }
