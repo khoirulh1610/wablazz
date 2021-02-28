@@ -114,6 +114,14 @@ if(get("act") == "hapus"){
                     <i class="fas fa-fw fa-comment-alt"></i>
                     <span>Tes Kirim</span></a>
             </li>
+            
+            <?php if($_SESSION['level'] == '1'){?>
+            <li class="nav-item">
+                <a class="nav-link" href="lisensi.php">
+                    <i class="fas fa-fw fa-key"></i>
+                    <span>Lisensi</span></a>
+            </li>
+            <?php } ?>
 
             <li class="nav-item">
                 <a class="nav-link" href="rest_api.php">

@@ -102,11 +102,22 @@ if(get("act") == "cn"){
                     <span>Tes Kirim</span></a>
             </li>
 
+            <?php if($_SESSION['level'] == '1'){?>
+            <li class="nav-item">
+                <a class="nav-link" href="lisensi.php">
+                    <i class="fas fa-fw fa-key"></i>
+                    <span>Lisensi</span></a>
+            </li>
+            <?php } ?>
+
+                
             <li class="nav-item active">
                 <a class="nav-link" href="rest_api.php">
                     <i class="fas fa-fw fa-code"></i>
                     <span>Rest API</span></a>
             </li>
+
+            
 
             <li class="nav-item">
                 <a class="nav-link" href="pengaturan.php">

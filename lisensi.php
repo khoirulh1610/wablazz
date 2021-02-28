@@ -1,56 +1,10 @@
 <?php
 include_once("helper/koneksi.php");
 include_once("helper/function.php");
-
-
 $login = cekSession();
 if($login == 0){
     redirect("login.php");
 }
-
-if($_SESSION['level'] != 1){
-    echo "Tidak diizinkan akses halaman ini";
-    exit;
-}
-
-if(post("username")){
-    $u = post("username");
-    $p = sha1(post("password"));
-    $l = post("level");
-
-    $count = countDB("account", "username", $u);
-
-    if($count == 0){
-        $q = mysqli_query($koneksi, "INSERT INTO account(`username`, `password`, `level`)
-        VALUES('$u', '$p', '$l')");
-        toastr_set("success", "Sukses membuat user");
-    }else{
-        toastr_set("error", "Username telah terpakai");
-    }
-}
-
-if(get("act") == "hapus"){
-    $id = get("id");
-
-    $q = mysqli_query($koneksi, "DELETE FROM account WHERE id='$id'");
-    toastr_set("success", "Sukses hapus user");
-}
-
-if(post("chunk")){
-    $chunk = post("chunk");
-    $wa = post("wa");
-    $api_key = post("api_key");
-    $nomor = post("nomor");
-    mysqli_query($koneksi, "UPDATE pengaturan SET chunk = '$chunk', wa_gateway_url = '$wa', api_key='$api_key', nomor='$nomor' WHERE id='1'");
-    toastr_set("success", "Sukses edit pengaturan");
-}
-
-if(get("act") == "gapi"){
-    $api_key = sha1(date("Y-m-d H:i:s").rand(100000, 999999));
-    mysqli_query($koneksi, "UPDATE pengaturan SET api_key='$api_key' WHERE id='1'");
-    toastr_set("success", "Sukses generate api key baru");
-}
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -128,7 +82,7 @@ if(get("act") == "gapi"){
                     <span>Kirim Masal</span></a>
             </li>
 
-            <li class="nav-item">
+            <li class="nav-item active">
                 <a class="nav-link" href="tes_kirim.php">
                     <i class="fas fa-fw fa-comment-alt"></i>
                     <span>Tes Kirim</span></a>
@@ -141,14 +95,14 @@ if(get("act") == "gapi"){
                     <span>Lisensi</span></a>
             </li>
             <?php } ?>
-            
+
             <li class="nav-item">
                 <a class="nav-link" href="rest_api.php">
                     <i class="fas fa-fw fa-code"></i>
                     <span>Rest API</span></a>
             </li>
 
-            <li class="nav-item active">
+            <li class="nav-item">
                 <a class="nav-link" href="pengaturan.php">
                     <i class="fas fa-fw fa-cogs"></i>
                     <span>Pengaturan</span></a>
@@ -184,7 +138,7 @@ if(get("act") == "gapi"){
 
 
                         <!-- Nav Item - Messages -->
-
+                
                         <div class="topbar-divider d-none d-sm-block"></div>
 
                         <!-- Nav Item - User Information -->
@@ -214,92 +168,31 @@ if(get("act") == "gapi"){
                 <div class="container-fluid">
 
                     <!-- DataTales Example -->
-                    <div class="row">
-                        <div class="col-md-6">
-                        <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#exampleModal">
-                            Tambah User
-                        </button>
-                        <br>
-                        <div class="card shadow mb-4">
-
-                            <div class="card-header py-3">
-                                <h6 class="m-0 font-weight-bold text-primary">Data User</h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                        <thead>
-                                            <tr>
-                                                <th>ID</th>
-                                                <th>Username</th>
-                                                <th>Level</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php
-                                            $q = mysqli_query($koneksi, "SELECT * FROM account");
-                                            while($row = mysqli_fetch_assoc($q)){
-                                                echo '<tr>';
-                                                echo '<td>'.$row['id'].'</td>';
-                                                echo '<td>'.$row['username'].'</td>';
-                                                if($row['level'] == 1){
-                                                    echo '<td>Admin</td>';
-                                                }else{
-                                                    echo '<td>CS</td>';
-                                                }
-                                                echo '<td><a class="btn btn-danger" href="pengaturan.php?act=hapus&id='.$row['id'].'">Hapus</a></td>';
-                                                echo '</tr>';
-                                            }
-
-                                            ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Generate Lisensi</h6>
                         </div>
-
-                        </div>
-
-                        <div class="col-md-6">
-                        <div class="card shadow mb-4">
-
-                            <div class="card-header py-3">
-                                <h6 class="m-0 font-weight-bold text-primary">Pengaturan</h6>
-                            </div>
-                            <div class="card-body">
-                                <h4> Whatsapp Gateway : <span id="status"></span> </h4>
-                                <h4><span id="qr"></span> </h4>
-                                <a class="btn btn-danger btn-block" target="_blank" href="<?= url_wa() ?>/deletesess"> Logout </a>
-                                <a class="btn btn-danger btn-block" target="_blank" href="<?= url_wa() ?>/reset"> Reset</a>
+                        <div class="card-body">
+                            <form action="" method="post">
+                                <label> Pilih user </label>
+                                <select class="form-control" name="user_id" id="user_id" required>
+                                    <option value="">Pilih</option>
+                                    <?php 
+                                    $query = mysqli_query($koneksi, "select *from account where level='3' order by `username`");
+                                    while($data=mysqli_fetch_object($query)){
+                                        echo "<option value='$data->id'>$data->username</option>";
+                                    }
+                                    ?>
+                                </select>
                                 <br>
-                                <hr>
-                                <form action="" method="post">
-                                    <label> URL Whatsapp Gateway </label>
-                                    <input type="text" class="form-control" name="wa" value="<?= url_wa() ?>">
-                                    <br>
-                                    <label> Nomor Whatsapp Yang Terkoneksi </label>
-                                    <input type="text" class="form-control" name="nomor" value="<?= getSingleValDB("pengaturan", "id", "1", "nomor") ?>">
-                                    <br>
-                                    <label> Batas Pengiriman per menit </label>
-                                    <input type="text" class="form-control" name="chunk" value="<?= getSingleValDB("pengaturan", "id", "1", "chunk") ?>">
-                                    <br>
-                                    <label> API Key </label>
-                                    <input type="text" class="form-control" name="api_key" readonly value="<?= getSingleValDB("pengaturan", "id", "1", "api_key") ?>">
-                                    <br>
-                                    <button class="btn btn-success"> Simpan </button>
-                                    <a class="btn btn-primary" href="pengaturan.php?act=gapi"> Generate New API Key </a>
-                                </form>
-                            </div>
-                        </div>
-
+                                <span id="data"></span>
+                                <button class='btn btn-success' id='btn_generate'  type='button'>Generate</button>
+                         </form>
                         </div>
                     </div>
 
-
                 </div>
                 <!-- /.container-fluid -->
-
             </div>
             <!-- End of Main Content -->
 
@@ -344,39 +237,6 @@ if(get("act") == "gapi"){
         </div>
     </div>
 
-    <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Tambah User</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        <div class="modal-body">
-            <form action="" method="POST">
-                <label> Username </label>
-                <input type="text" name="username" required class="form-control">
-                <br>
-                <label> Password </label>
-                <input type="password" name="password" required class="form-control">
-                <br>
-                <label for="exampleFormControlSelect1">Level</label>
-                <select class="form-control" id="exampleFormControlSelect1" name="level">
-                    <option value="1">Admin</option>
-                    <option value="2">CS</option>
-                </select>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary">Simpan</button>
-            </form>
-        </div>
-        </div>
-    </div>
-    </div>
-
 <!-- Bootstrap core JavaScript-->
     <script src="vendor/jquery/jquery.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -401,32 +261,41 @@ if(get("act") == "gapi"){
         toastr_show();
 
         ?>
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/davidshimjs-qrcodejs@0.0.2/qrcode.min.js"></script>
-    <script>
-        getWaStatus();
-        setInterval(getWaStatus, 3000);
-        function getWaStatus(){
-            $.get( "/wablazz/status.php", function( data ) {
-                console.log(data);
-                if(data.msg == "READY"){
-                    $("#status").html('<span class="badge badge-success">READY</span>');
-                    $("#qr").empty();
-                }else{
-                    $("#status").html('<span class="badge badge-danger">NOT READY, PLEASE SCAN QR CODE</span>');
-                    getAndShowQR();
-                }
-            });
-        }
 
-        function getAndShowQR(){
-            $.get( "/wablazz/qr.php", function( data ) {
-                if(data.data.qr){
-                  $("#qr").empty();
-                  new QRCode(document.getElementById("qr"), data.data.qr);
+        $("#user_id").change(function(){
+            let user_id = $("#user_id").val();
+            $.ajax({
+                url : "action.php?msg=lisensi_show",
+                type : "POST",
+                data : {user_id:user_id},
+                success : function(msg){
+                    $("#data").html(msg);
                 }
             });
-        }
+        })
+
+
+        $("#btn_generate").click(function(){
+            
+            var user_id = $("#user_id").val();
+            var serial = $("#serial").val();
+            var start_date = $("#start_date").val();
+            var end_date = $("#end_date").val();
+            $.ajax({
+                url : "action.php?msg=lisensi_insert",
+                type : "POST",
+                data : {user_id:user_id,serial:serial,start_date:start_date,end_date:end_date},
+                success : function(msg){
+                    if(msg == 'sukses'){
+                        alert('berhasil di buat');
+                        location.reload();
+                    }else{
+                        alert('gagal dibuat');
+                    }
+                }
+            });
+        }); 
     </script>
 </body>
+
 </html>
