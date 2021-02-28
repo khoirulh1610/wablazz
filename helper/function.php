@@ -79,6 +79,13 @@ function getAllNumber(){
     return $arr;
 }
 
+function getNama($nomor=""){
+    global $koneksi;
+    $q = mysqli_query($koneksi, "SELECT * FROM `nomor` where nomor='".$nomor."'");
+    $row = mysqli_fetch_assoc($q);
+    return $row['nama'] ;
+}
+
 function getLastID($table){
     global $koneksi;
     $q = mysqli_query($koneksi, "SELECT * FROM `$table` ORDER BY id DESC LIMIT 1");
@@ -168,7 +175,8 @@ function sendIMG($number, $msg, $file){
 }
 
 function cekStatusWA(){
-    $url = url_wa()."/status";
+    global $base_url;
+    $url = $base_url."status.php";
 
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_URL, $url);
@@ -177,6 +185,7 @@ function cekStatusWA(){
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     //curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
     $response = curl_exec($curl);
+    // return $url;
     return json_decode($response, true);
 }
 
@@ -390,7 +399,6 @@ function googleForm(){
 
 
 
-
 function generate_license($suffix = null) {
     // Default tokens contain no "ambiguous" characters: 1,i,0,o
     if(isset($suffix)){
@@ -428,5 +436,32 @@ function generate_license($suffix = null) {
         }
     }
     return $license_string;
+}
+
+
+function SpinText($string){    
+    $total = substr_count($string,"{");
+    if($total>0){
+        for ($i=0; $i < $total; $i++) { 
+            $awal = strpos($string,"{");
+            $startCharCount = strpos($string,"{")+1;
+            $firstSubStr = substr($string, $startCharCount, strlen($string));
+            $endCharCount = strpos($firstSubStr, "}");        
+            if ($endCharCount == 0) {
+                $endCharCount = strlen($firstSubStr);
+            }
+            $hasil1 =  substr($firstSubStr, 0, $endCharCount);
+            $rw = explode("|",$hasil1);
+            $hasil2 = $hasil1;
+            if(count($rw)>0){
+                $n = rand(0,count($rw)-1);
+                $hasil2 = $rw[$n];
+            }
+            $string = str_replace("{".$hasil1."}",$hasil2,$string);    
+        }
+        return $string;
+    }else {
+        return $string;
+    }
 }
 

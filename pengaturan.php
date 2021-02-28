@@ -420,7 +420,11 @@ if(get("act") == "gapi"){
         }
 
         function getAndShowQR(){
+<<<<<<< HEAD
             $.get( "/wablazz/qr.php", function( data ) {
+=======
+            $.get( "/qr.php", function( data ) {
+>>>>>>> 0e1a2431ea756276ef6d9987f72a38930627bc7d
                 if(data.data.qr){
                   $("#qr").empty();
                   new QRCode(document.getElementById("qr"), data.data.qr);
